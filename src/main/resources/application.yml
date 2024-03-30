@@ -1,0 +1,29 @@
+spring:
+  data:
+    redis:
+      host: redis-13412.c292.ap-southeast-1-1.ec2.cloud.redislabs.com
+      port: 13412
+      password: 5e2OwckODJanB5Z0TvRwKJgeLveQkDNL
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project_3?currentSchema=lms-test&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: true
+
+security:
+  jwt:
+    secret: 9a4f2c8d3b7a1e6f45c8a0b3f267d8b1d4e6f3c8a9d2b5f8e3a9c8b5f6v8a3d4
+    access-token-expiration: 86400000
+    refresh-token-expiration: 604800000
