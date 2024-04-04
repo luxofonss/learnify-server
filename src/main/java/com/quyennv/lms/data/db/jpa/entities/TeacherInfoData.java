@@ -8,8 +8,9 @@ import lombok.*;
 import java.util.List;
 
 @Entity(name="teacher_info")
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"user"})
 @Table(name="teacher_info")
 @AllArgsConstructor
 @NoArgsConstructor

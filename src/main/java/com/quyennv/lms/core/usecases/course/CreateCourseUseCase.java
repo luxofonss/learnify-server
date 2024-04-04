@@ -5,7 +5,6 @@ import com.quyennv.lms.core.domain.enums.CourseInfoType;
 import com.quyennv.lms.core.domain.enums.CourseLevel;
 import com.quyennv.lms.core.usecases.UseCase;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -53,7 +52,7 @@ public class CreateCourseUseCase extends UseCase<CreateCourseUseCase.InputValues
                                 .type(i.getType())
                                 .build()
             ).toList();
-            course.setCourseInfo(courseInfos);
+            course.setCourseInfos(courseInfos);
         }
 
         if (Objects.nonNull(input.getSections())) {

@@ -1,10 +1,7 @@
 package com.quyennv.lms.core.usecases.course;
 
 
-import com.quyennv.lms.core.domain.entities.Course;
-import com.quyennv.lms.core.domain.entities.Identity;
-import com.quyennv.lms.core.domain.entities.Lecture;
-import com.quyennv.lms.core.domain.entities.Section;
+import com.quyennv.lms.core.domain.entities.*;
 import com.quyennv.lms.core.domain.enums.CourseInfoType;
 import com.quyennv.lms.core.domain.enums.CourseLevel;
 import com.quyennv.lms.core.domain.enums.EnrollStatus;
@@ -37,7 +34,6 @@ public abstract class CourseUpdateUseCase extends UseCase<CourseUpdateUseCase.In
         }
 
         Course course = update(existCourse, input);
-        log.info("course:: {}", course);
         return persistAndReturn(course);
     }
 
@@ -66,6 +62,17 @@ public abstract class CourseUpdateUseCase extends UseCase<CourseUpdateUseCase.In
 
                     return returnSection;
                 }
+        ).toList();
+    }
+
+    public List<CourseInfo> mapCourseInfos(List<CourseInfoInput> courseInfoInputs) {
+        return courseInfoInputs.stream().map(i ->
+                CourseInfo
+                        .builder()
+                        .id(i.getId())
+                        .type(i.getType())
+                        .content(i.getContent())
+                        .build()
         ).toList();
     }
 

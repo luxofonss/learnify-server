@@ -30,6 +30,7 @@ public class User {
     private Address address;
     private LearnerInfo learnerInfo;
     private TeacherInfo teacherInfo;
+    @JsonIgnore
     private Auth auth;
 
     private LocalDateTime createdAt;

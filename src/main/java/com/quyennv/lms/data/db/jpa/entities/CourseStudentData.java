@@ -11,11 +11,13 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(of = "id")
 @Entity(name="course_students")
-@Data
+@Setter
+@Getter
 @Table(name="course_students")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = {"course", "student"})
 public class CourseStudentData {
     @EmbeddedId
     CourseStudentDataKey id;
@@ -24,7 +26,7 @@ public class CourseStudentData {
     @MapsId("courseId")
     @JoinColumn(name="course_id")
     CourseData course;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("studentId")
     @JoinColumn(name="student_id")
     UserData student;
@@ -58,7 +60,7 @@ public class CourseStudentData {
         return CourseStudent
                 .builder()
                 .student(this.student.fromThis())
-                .course(this.course.fromThis())
+//                .course(this.course.fromThis())
                 .price(this.price)
                 .status(this.status)
                 .createdAt(this.createdAt)

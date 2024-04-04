@@ -1,5 +1,9 @@
 package com.quyennv.lms.presenter.config;
 
+import com.quyennv.lms.core.domain.entities.Course;
+import com.quyennv.lms.core.usecases.assignment.AssignmentRepository;
+import com.quyennv.lms.core.usecases.assignment.CreateAssignmentUseCase;
+import com.quyennv.lms.core.usecases.assignment.UpdateAssignmentDetailUseCase;
 import com.quyennv.lms.core.usecases.course.*;
 import com.quyennv.lms.core.usecases.user.CreateUserUseCase;
 import com.quyennv.lms.core.usecases.user.GetAuthProfileUseCase;
@@ -63,5 +67,64 @@ public class Module {
     @Bean
     GetOneCourseUseCase getOneCourseUseCase(CourseRepository repository){
         return new GetOneCourseUseCase(repository);
+    }
+
+    @Bean
+    GetCreatedCoursesUseCase getCreatedCoursesUseCase(CourseRepository repository) {
+        return new GetCreatedCoursesUseCase(repository);
+    }
+
+    @Bean
+    GetAllCourseUseCase getAllCourseUseCase(CourseRepository repository) {
+        return new GetAllCourseUseCase(repository);
+    }
+
+    @Bean
+    UpdateCourseDetailUseCase updateCourseDetailUseCase(CourseRepository repository) {
+        return new UpdateCourseDetailUseCase(repository);
+    }
+
+    @Bean
+    DeleteCourseUseCase deleteCourseUseCase(CourseRepository repository) {
+        return new DeleteCourseUseCase(repository);
+    }
+    @Bean
+    StudentRegisterForCourseUseCase studentRegisterForCourseUseCase(CourseRepository courseRepository,
+                                                                    CourseStudentRepository courseStudentRepository) {
+        return new StudentRegisterForCourseUseCase(courseRepository, courseStudentRepository);
+    }
+    @Bean
+    TeacherAddStudentsToCourseUseCase teacherAddStudentsToCourseUseCase(CourseRepository courseRepository, CourseStudentRepository courseStudentRepository) {
+        return new TeacherAddStudentsToCourseUseCase(courseRepository, courseStudentRepository);
+    }
+
+    @Bean
+    UpdateCourseStudentStatusUseCase updateCourseStudentUseCase(CourseStudentRepository courseStudentRepository) {
+        return new UpdateCourseStudentStatusUseCase(courseStudentRepository);
+    }
+
+    @Bean
+    DeleteCourseStudentUseCase deleteCourseStudentUseCase(CourseStudentRepository courseStudentRepository) {
+        return new DeleteCourseStudentUseCase(courseStudentRepository);
+    }
+
+    @Bean
+    CourseStudentsGetAllUseCase courseStudentsGetAllUseCase(CourseRepository courseRepository, CourseStudentRepository courseStudentRepository) {
+        return new CourseStudentsGetAllUseCase(courseRepository, courseStudentRepository);
+    }
+
+    @Bean
+    StudentGetRegisteredCoursesUseCase studentGetRegisteredCoursesUseCase(CourseStudentRepository courseStudentRepository) {
+        return new StudentGetRegisteredCoursesUseCase(courseStudentRepository);
+    }
+
+    @Bean
+    CreateAssignmentUseCase createAssignmentUseCase(AssignmentRepository assignmentRepository) {
+        return new CreateAssignmentUseCase(assignmentRepository);
+    }
+
+    @Bean
+    UpdateAssignmentDetailUseCase updateAssignmentDetailUseCase(AssignmentRepository assignmentRepository) {
+        return new UpdateAssignmentDetailUseCase(assignmentRepository);
     }
 }

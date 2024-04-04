@@ -1,0 +1,135 @@
+package com.quyennv.lms.core.usecases.assignment;
+
+import com.quyennv.lms.core.domain.entities.*;
+import com.quyennv.lms.core.domain.enums.QuestionLevel;
+import com.quyennv.lms.core.domain.enums.QuestionType;
+import com.quyennv.lms.core.usecases.UseCase;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Value;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+
+public abstract class UpdateAssignmentUseCase extends UseCase<
+        UpdateAssignmentUseCase.InputValues, UpdateAssignmentUseCase.OutputValues>{
+    private final AssignmentRepository assignmentRepository;
+
+    public UpdateAssignmentUseCase(AssignmentRepository assignmentRepository) {
+        this.assignmentRepository = assignmentRepository;
+    }
+
+    @Override
+    public OutputValues execute(InputValues input) {
+        Assignment assignment = assignmentRepository.findById(input.getId())
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+
+        if (checkPermission(input, assignment).equals(Boolean.FALSE)) {
+            throw new RuntimeException("Error permission");
+        }
+
+        Assignment updatedAssignment = update(input, assignment);
+        return new OutputValues(assignmentRepository.persist(updatedAssignment));
+    }
+
+    public abstract Assignment update(InputValues input, Assignment assignment);
+
+    public List<Question> mapQuestions(InputValues input) {
+        return input.getQuestions().stream().map(
+                q -> {
+                    Question question = Question
+                            .builder()
+                            .id(q.getId())
+                            .level(q.getLevel())
+                            .title(q.getTitle())
+                            .image(q.getImage())
+                            .audio(q.getAudio())
+                            .subject(Objects.nonNull(input.getSubjectId()) ? Subject.builder().id(input.getSubjectId()).build() : null)
+                            .mark(q.getMark())
+                            .type(q.getType())
+                            .answerExplanation(q.getAnswerExplanation())
+                            .creator(User.builder().id(input.getTeacherId()).build())
+                            .build();
+
+                    if(Objects.nonNull(q.getChoices())) {
+                        question.setChoices(q.getChoices().stream().map(
+                                c -> QuestionChoice
+                                        .builder()
+                                        .id(c.getId())
+                                        .content(c.getContent())
+                                        .order(c.getOrder())
+                                        .isCorrect(c.getIsCorrect())
+                                        .explanation(c.getExplanation())
+                                        .build()
+                        ).toList());
+                    }
+                    if(Objects.nonNull(q.getTextAnswers())) {
+                        question.setTextAnswers(q.getTextAnswers().stream().map(
+                                ta -> QuestionTextAnswer
+                                        .builder()
+                                        .id(ta.getId())
+                                        .answer(ta.getAnswer())
+                                        .explanation(ta.getExplanation())
+                                        .build()
+                        ).toList());
+                    }
+                    return question;
+                }
+        ).toList();
+    }
+
+    private Boolean checkPermission(InputValues input, Assignment assignment) {
+        return true;
+    }
+
+    @Value
+    @Builder
+    public static class InputValues implements UseCase.InputValues {
+        Identity id;
+        String title;
+        String description;
+        Identity teacherId;
+        Identity subjectId;
+        List<UpdateAssignmentUseCase.QuestionInput> questions;
+    }
+
+    @Value
+    public static class OutputValues implements UseCase.OutputValues {
+        Assignment assignment;
+    }
+
+    @Data
+    @Builder
+    public static class QuestionInput {
+        Identity id;
+        String title;
+        String description;
+        String image;
+        String audio;
+        Integer mark;
+        QuestionLevel level;
+        QuestionType type;
+        String answerExplanation;
+        List<UpdateAssignmentUseCase.QuestionChoiceInput> choices;
+        List<UpdateAssignmentUseCase.QuestionTextAnswerInput> textAnswers;
+    }
+
+    @Value
+    @Builder
+    public static class QuestionChoiceInput {
+        Identity id;
+        String content;
+        Integer order;
+        Boolean isCorrect;
+        String explanation;
+    }
+
+    @Value
+    @Builder
+    public static class QuestionTextAnswerInput {
+        Identity id;
+        String answer;
+        String explanation;
+    }
+}

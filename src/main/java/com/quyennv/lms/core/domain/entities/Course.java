@@ -1,5 +1,6 @@
 package com.quyennv.lms.core.domain.entities;
 
+import com.quyennv.lms.core.domain.enums.CourseInfoType;
 import com.quyennv.lms.core.domain.enums.CourseLevel;
 import com.quyennv.lms.core.utils.FunctionHelper;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -34,7 +36,7 @@ public class Course {
     private String code;
 
     private List<Section> sections;
-    private List<CourseInfo> courseInfo;
+    private List<CourseInfo> courseInfos;
     private List<AssignmentPlacement> assignmentPlacements;
     private Subject subject;
     private User teacher;
@@ -43,6 +45,35 @@ public class Course {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public Course updateCourse(Course course) {
+        BeanUtils.copyProperties(course, this, FunctionHelper.getNullPropertyNames(course));
+
+        if (Objects.nonNull(course.getSections())) {
+            this.updateSections(course.getSections());
+        }
+
+        if (Objects.nonNull(course.getCourseInfos())) {
+            this.setCourseInfos(this.courseInfos.stream().map(info -> {
+                for (CourseInfo i : course.getCourseInfos()) {
+                    if (i.getId().equals(info.getId())) {
+                        BeanUtils.copyProperties(i, info, FunctionHelper.getNullPropertyNames(i));
+                        break;
+                    }
+                }
+
+                return info;
+            }).toList());
+            this.setCourseInfos(course.getCourseInfos());
+        }
+
+        return this;
+    }
+
+    public Course delete() {
+        this.deletedAt = LocalDateTime.now();
+        return this;
+    }
 
     public Course addSections(List<Section> sections) {
         Set<Section> allSections = new HashSet<>(this.sections);
@@ -82,7 +113,6 @@ public class Course {
     }
 
     public Course addLectures(List<Lecture> lectures, Identity sectionId) {
-        log.info("this:: {}", this);
         this.sections.forEach(section -> {
             if (section.getId().equals(sectionId)) {
                 Set<Lecture> newLectures = new HashSet<>(section.getLectures());

@@ -5,6 +5,8 @@ import com.quyennv.lms.core.domain.entities.QuestionTextAnswer;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="question_text_answers")
 @Data
@@ -24,10 +26,12 @@ public class QuestionTextAnswerData extends BaseEntity{
                 .builder()
                 .answer(a.getAnswer())
                 .explanation(a.getExplanation())
-                .question(QuestionData.from(a.getQuestion()))
+                .question(Objects.nonNull(a.getQuestion())? QuestionData.from(a.getQuestion()) : null)
                 .build();
 
-        result.setId(a.getId().getId());
+        if(Objects.nonNull(a.getId())) {
+            result.setId(a.getId().getId());
+        }
         result.setCreatedAt(a.getCreatedAt());
         result.setUpdatedAt(a.getUpdatedAt());
         result.setDeletedAt(a.getDeletedAt());
@@ -41,7 +45,7 @@ public class QuestionTextAnswerData extends BaseEntity{
                 .id(Identity.from(this.getId()))
                 .answer(this.answer)
                 .explanation(this.explanation)
-                .question(this.question.fromThis())
+//                .question(this.question.fromThis())
                 .createdAt(this.getCreatedAt())
                 .updatedAt(this.getUpdatedAt())
                 .deletedAt(this.getDeletedAt())

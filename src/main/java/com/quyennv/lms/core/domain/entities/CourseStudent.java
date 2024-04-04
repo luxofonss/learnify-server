@@ -21,4 +21,14 @@ public class CourseStudent {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public CourseStudent withStatus(EnrollStatus status) {
+        this.status = status;
+        return this;
+    }
+
+    public CourseStudent delete() {
+        this.deletedAt = LocalDateTime.now();
+        return this;
+    }
 }

@@ -55,7 +55,9 @@ public class QuestionAnswerData extends BaseEntity{
             result.setFeedbacks(qa.getFeedbacks().stream().map(f -> QuestionAnswerFeedbackData.from(f)).toList());
         }
 
-        result.setId(qa.getId().getId());
+        if (Objects.nonNull(qa.getId())) {
+            result.setId(qa.getId().getId());
+        }
         result.setCreatedAt(qa.getCreatedAt());
         result.setUpdatedAt(qa.getUpdatedAt());
         result.setDeletedAt(qa.getDeletedAt());

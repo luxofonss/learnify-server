@@ -10,7 +10,9 @@ import java.util.Objects;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="auths")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"user"})
 @Table(name="auths")
 @AllArgsConstructor
 @NoArgsConstructor

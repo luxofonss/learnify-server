@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.Objects;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="subjects")
 @Data
@@ -26,7 +28,9 @@ public class SubjectData extends BaseEntity {
                 .thumbnail(s.getThumbnail())
                 .build();
 
-        result.setId(s.getId().getId());
+        if (Objects.nonNull(s.getId())) {
+            result.setId(s.getId().getId());
+        }
         result.setCreatedAt(s.getCreatedAt());
         result.setUpdatedAt(s.getUpdatedAt());
         result.setDeletedAt(s.getDeletedAt());

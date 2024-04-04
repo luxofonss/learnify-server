@@ -1,18 +1,21 @@
 package com.quyennv.lms.core.domain.entities;
 
 import com.quyennv.lms.core.domain.enums.AssignmentType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.quyennv.lms.core.utils.FunctionHelper;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
+@Slf4j
 public class Assignment {
     private Identity id;
     private String title;
@@ -21,8 +24,26 @@ public class Assignment {
     private User teacher;
     private Subject subject;
     private List<Question> questions;
+    private List<AssignmentPlacement> placements;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public Assignment update(Assignment updateAssignment) {
+        BeanUtils.copyProperties(updateAssignment, this, FunctionHelper.getNullPropertyNames(updateAssignment));
+
+        if (Objects.nonNull(updateAssignment.getQuestions())) {
+            this.questions.forEach(q -> {
+                updateAssignment.getQuestions().forEach(updatedQuestion -> {
+                    if (q.getId().equals(updatedQuestion.getId())) {
+                        q.update(updatedQuestion);
+                    }
+                });
+            });
+            this.setQuestions(updateAssignment.getQuestions());
+        }
+
+        return this;
+    }
 }

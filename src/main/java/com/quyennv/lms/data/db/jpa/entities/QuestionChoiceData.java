@@ -4,17 +4,21 @@ import com.quyennv.lms.core.domain.entities.Identity;
 import com.quyennv.lms.core.domain.entities.QuestionChoice;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Objects;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="question_choices")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"question", "chosenAnswers"})
 @Table(name="question_choices")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Slf4j
 public class QuestionChoiceData extends BaseEntity {
     private String content;
     @Column(name="ord")
@@ -36,8 +40,13 @@ public class QuestionChoiceData extends BaseEntity {
                 .order(c.getOrder())
                 .isCorrect(c.getIsCorrect())
                 .explanation(c.getExplanation())
-                .question(QuestionData.from(c.getQuestion()))
+                .question(Objects.nonNull(c.getQuestion()) ? QuestionData.from(c.getQuestion()) : null)
                 .build();
+
+        if (Objects.nonNull(c.getId())) {
+            result.setId(c.getId().getId());
+        }
+
 
         if (Objects.nonNull(c.getChosenAnswers())) {
             result.setChosenAnswers(c.getChosenAnswers().stream().map(QuestionAnswerData::from).toList());
@@ -54,7 +63,6 @@ public class QuestionChoiceData extends BaseEntity {
                 .isCorrect(this.isCorrect)
                 .content(this.content)
                 .explanation(this.explanation)
-                .question(this.question.fromThis())
                 .createdAt(this.getCreatedAt())
                 .updatedAt(this.getUpdatedAt())
                 .deletedAt(this.getDeletedAt())

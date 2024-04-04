@@ -2,55 +2,95 @@ package com.quyennv.lms.data.db.jpa.entities;
 
 import com.quyennv.lms.core.domain.entities.Identity;
 import com.quyennv.lms.core.domain.entities.Question;
+import com.quyennv.lms.core.domain.enums.QuestionLevel;
 import com.quyennv.lms.core.domain.enums.QuestionType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="questions")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"creator", "assignment", "subject", "quetions", "choices", "textAnswers", "questions"})
 @Table(name="questions")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Slf4j
 public class QuestionData extends BaseEntity{
     private String title;
     private String image;
     private String audio;
+    private Integer mark;
+    @Enumerated(EnumType.STRING)
+    private QuestionLevel level;
+    @Enumerated(EnumType.STRING)
     private QuestionType type;
     @Column(name="answer_explaination")
     private String answerExplanation;
 
-    @OneToMany(mappedBy="question")
+    @OneToMany(mappedBy="question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<QuestionChoiceData> choices;
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<QuestionTextAnswerData> textAnswers;
     @ManyToOne
+    @JoinColumn(name="subject_id")
+    private SubjectData subject;
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="assignment_id")
     private AssignmentData assignment;
     @ManyToOne
     @JoinColumn(name="creator_id", nullable = false)
     private UserData creator;
+
     @ManyToOne
-    @JoinColumn(name="subject_id")
-    private SubjectData subject;
+    @JoinColumn(name="question_id")
+    private QuestionData question;
+
+    @OneToMany(mappedBy="question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<QuestionData> questions;
+
+    public static QuestionData withId(UUID id) {
+        QuestionData q = QuestionData.builder().build();
+        q.setId(id);
+        return q;
+    }
 
     public static QuestionData from(Question q) {
         QuestionData result = QuestionData
                 .builder()
+                .level(q.getLevel())
                 .title(q.getTitle())
                 .image(q.getImage())
                 .audio(q.getAudio())
+                .mark(q.getMark())
                 .type(q.getType())
                 .answerExplanation(q.getAnswerExplanation())
                 .creator(UserData.from(q.getCreator()))
                 .build();
 
+        if (Objects.nonNull(q.getId())) {
+            result.setId(q.getId().getId());
+        }
+
         if (Objects.nonNull(q.getAssignment())) {
             result.setAssignment(AssignmentData.from(q.getAssignment()));
+        }
+
+        if (Objects.nonNull(q.getChoices())) {
+            List<QuestionChoiceData> choices = q.getChoices().stream().map(
+                    c -> {
+                        QuestionChoiceData choice = QuestionChoiceData.from(c);
+                        choice.setQuestion(result);
+                        return choice;
+                    }
+            ).toList();
+            result.setChoices(choices);
         }
 
         if (Objects.nonNull(q.getSubject())) {
@@ -58,19 +98,43 @@ public class QuestionData extends BaseEntity{
         }
 
         if (Objects.nonNull(q.getTextAnswers())) {
-            result.setTextAnswers(q.getTextAnswers().stream().map(a -> QuestionTextAnswerData.from(a)).toList());
+            List<QuestionTextAnswerData> textAnswers = q.getTextAnswers().stream().map(
+                    t -> {
+                        QuestionTextAnswerData textAnswer = QuestionTextAnswerData.from(t);
+                        textAnswer.setQuestion(result);
+                        return textAnswer;
+                    }
+            ).toList();
+            result.setTextAnswers(textAnswers);
         }
 
-        return result;
+        if (Objects.nonNull(q.getQuestions())) {
+            List<QuestionData> questions = q.getQuestions().stream().map(
+                    qu -> {
+                        QuestionData question = QuestionData.from(qu);
+                        question.setQuestion(result);
+                        return question;
+                    }
+            ).toList();
+            result.setQuestions(questions);
+        }
+
+        if (Objects.nonNull(q.getQuestion())) {
+            result.setQuestion(QuestionData.withId(q.getQuestion().getId().getId()));
+        }
+
+         return result;
     }
 
     public Question fromThis() {
         Question result = Question
                 .builder()
                 .id(Identity.from(this.getId()))
+                .level(this.level)
                 .title(this.title)
                 .image(this.image)
                 .audio(this.audio)
+                .mark(this.mark)
                 .type(this.type)
                 .answerExplanation(this.answerExplanation)
                 .creator(this.creator.fromThis())
@@ -80,7 +144,7 @@ public class QuestionData extends BaseEntity{
                 .build();
 
         if (Objects.nonNull(this.choices)) {
-            result.setChoices(this.choices.stream().map(c -> c.fromThis()).toList());
+            result.setChoices(this.choices.stream().map(QuestionChoiceData::fromThis).toList());
         }
 
         if (Objects.nonNull(this.subject)) {
@@ -88,7 +152,11 @@ public class QuestionData extends BaseEntity{
         }
 
         if (Objects.nonNull(this.textAnswers)) {
-            result.setTextAnswers(this.textAnswers.stream().map(a -> a.fromThis()).toList());
+            result.setTextAnswers(this.textAnswers.stream().map(QuestionTextAnswerData::fromThis).toList());
+        }
+
+        if (Objects.nonNull(this.questions)) {
+            result.setQuestions(this.questions.stream().map(QuestionData::fromThis).toList());
         }
 
         return result;

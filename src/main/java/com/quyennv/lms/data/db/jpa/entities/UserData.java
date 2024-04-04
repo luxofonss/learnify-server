@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity(name="users")
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
+@Setter
 @Table(name="users")
 @AllArgsConstructor
 @NoArgsConstructor

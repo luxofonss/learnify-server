@@ -1,16 +1,16 @@
 package com.quyennv.lms.core.domain.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.quyennv.lms.core.utils.FunctionHelper;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class QuestionChoice {
     private Identity id;
@@ -25,4 +25,10 @@ public class QuestionChoice {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public QuestionChoice update(QuestionChoice updatedChoice) {
+        BeanUtils.copyProperties(updatedChoice, this, FunctionHelper.getNullPropertyNames(updatedChoice));
+
+        return this;
+    }
 }

@@ -1,15 +1,16 @@
 package com.quyennv.lms.core.domain.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.quyennv.lms.core.utils.FunctionHelper;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"question"})
 @Builder
 public class QuestionTextAnswer {
     Identity id;
@@ -21,4 +22,10 @@ public class QuestionTextAnswer {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public QuestionTextAnswer update(QuestionTextAnswer updatedTextAnswer) {
+        BeanUtils.copyProperties(updatedTextAnswer, this, FunctionHelper.getNullPropertyNames(updatedTextAnswer));
+
+        return this;
+    }
 }

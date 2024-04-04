@@ -14,12 +14,14 @@ import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity(name="courses")
-@Data
-@Table(name="courses")
+@Table()
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @Slf4j
+@ToString(exclude = {"sections", "courseInfos", "assignmentPlacements", "subject", "teacher", "courseStudents"})
 public class CourseData extends BaseEntity{
     private String name;
     private String description;
@@ -68,8 +70,8 @@ public class CourseData extends BaseEntity{
                 .isVerified(course.getIsVerified())
                 .grade(course.getGrade())
                 .code(course.getCode())
-                .subject(SubjectData.from(course.getSubject()))
-                .teacher(UserData.from(course.getTeacher()))
+                .subject(Objects.nonNull(course.getSubject()) ? SubjectData.from(course.getSubject()) : null)
+                .teacher(Objects.nonNull(course.getTeacher()) ? UserData.from(course.getTeacher()) : null)
                 .build();
 
         if (Objects.nonNull(course.getId())) {
@@ -90,8 +92,8 @@ public class CourseData extends BaseEntity{
             }).toList());
         }
 
-        if (Objects.nonNull(course.getCourseInfo())) {
-            result.setCourseInfos(course.getCourseInfo().stream().map(i -> {
+        if (Objects.nonNull(course.getCourseInfos())) {
+            result.setCourseInfos(course.getCourseInfos().stream().map(i -> {
                 CourseInfoData courseInfo = CourseInfoData.from(i);
                 courseInfo.setCourse(result);
                 return courseInfo;
@@ -137,8 +139,8 @@ public class CourseData extends BaseEntity{
                 .deletedAt(this.getDeletedAt())
                 .build();
 
-        if (Objects.nonNull(this.courseInfos)) {
-            course.setCourseInfo(this.courseInfos.stream().map(CourseInfoData::fromThis).toList());
+        if (Objects.nonNull(this.getCourseInfos())) {
+            course.setCourseInfos(this.courseInfos.stream().map(CourseInfoData::fromThis).toList());
         }
 
         if (Objects.nonNull(this.sections)) {
