@@ -1,13 +1,9 @@
 package com.quyennv.lms.core.domain.entities;
 
-import com.quyennv.lms.core.domain.enums.QuestionChoiceType;
 import com.quyennv.lms.core.domain.enums.QuestionLevel;
 import com.quyennv.lms.core.domain.enums.QuestionType;
 import com.quyennv.lms.core.utils.FunctionHelper;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
@@ -18,6 +14,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(of = {"id"})
 public class Question {
     private Identity id;
 
@@ -34,7 +31,7 @@ public class Question {
     private User creator;
     private Subject subject;
     private Question question;
-    private List<Question> questions;
+    private List<Question> subQuestions;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -54,15 +51,15 @@ public class Question {
             this.setChoices(updatedQuestion.getChoices());
         }
 
-        if (Objects.nonNull(updatedQuestion.getQuestions())) {
-            this.questions.forEach(q -> {
-                updatedQuestion.getQuestions().forEach(question -> {
+        if (Objects.nonNull(updatedQuestion.getSubQuestions())) {
+            this.subQuestions.forEach(q -> {
+                updatedQuestion.getSubQuestions().forEach(question -> {
                     if (q.getId().equals(question.getId())) {
                         q.update(question);
                     }
                 });
             });
-            this.setQuestions(updatedQuestion.getQuestions());
+            this.setSubQuestions(updatedQuestion.getSubQuestions());
         }
 
         if (updatedQuestion.getTextAnswers() != null) {

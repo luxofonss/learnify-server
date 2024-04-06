@@ -15,11 +15,11 @@ import java.util.Objects;
 @Repository
 public class CriteriaCourseRepository {
     private final EntityManager em;
-    private final CriteriaBuilder builder;
+    private final CriteriaBuilder cb;
 
     public CriteriaCourseRepository(EntityManager em) {
         this.em = em;
-        this.builder = em.getCriteriaBuilder();
+        this.cb = em.getCriteriaBuilder();
     }
 
     public List<CourseData> getWithFilters(
@@ -29,7 +29,7 @@ public class CriteriaCourseRepository {
             String code,
             List<Identity> teacherIds
     ) {
-        CriteriaQuery<CourseData> criteriaQuery = builder.createQuery(CourseData.class);
+        CriteriaQuery<CourseData> criteriaQuery = cb.createQuery(CourseData.class);
         Root<CourseData> courseRoot = criteriaQuery.from(CourseData.class);
 
         Predicate predicate = getPredicate(
@@ -43,7 +43,7 @@ public class CriteriaCourseRepository {
 
         criteriaQuery.where(predicate);
         List<Order> orders = new ArrayList<>();
-        orders.add(builder.desc(
+        orders.add(cb.desc(
                 courseRoot.get("updatedAt")
         ));
         criteriaQuery.orderBy(orders);
@@ -63,40 +63,40 @@ public class CriteriaCourseRepository {
 
         if (Objects.nonNull(keyword)) {
             predicates.add(
-                    builder.or(
-                            builder.like(courseRoot.get("name"), "%" + keyword + "%"),
-                            builder.like(courseRoot.get("description"), "%" + keyword + "%")
+                    cb.or(
+                            cb.like(courseRoot.get("name"), "%" + keyword + "%"),
+                            cb.like(courseRoot.get("description"), "%" + keyword + "%")
                     )
             );
         }
 
         if (Objects.nonNull(level)) {
-            predicates.add(builder.equal(courseRoot.get("level"), level.toString()));
+            predicates.add(cb.equal(courseRoot.get("level"), level.toString()));
         }
 
         if (Objects.nonNull(grade)) {
-            predicates.add(builder.equal(courseRoot.get("grade"), grade));
+            predicates.add(cb.equal(courseRoot.get("grade"), grade));
         }
 
         if (Objects.nonNull(code)) {
-            predicates.add(builder.equal(courseRoot.get("code"), code));
+            predicates.add(cb.equal(courseRoot.get("code"), code));
         }
 
         if (Objects.nonNull(code)) {
-            predicates.add(builder.equal(courseRoot.get("code"), code));
+            predicates.add(cb.equal(courseRoot.get("code"), code));
         }
 
         if(Objects.nonNull(teacherIds)) {
             List<Predicate> teacherPredicates = new ArrayList<>();
-            teacherIds.forEach(userId -> teacherPredicates.add(builder.equal(
+            teacherIds.forEach(userId -> teacherPredicates.add(cb.equal(
                     courseRoot.get("teacher").get("id"), userId.getId())
             ));
 
-            predicates.add(builder.or(
+            predicates.add(cb.or(
                     teacherPredicates.toArray(new Predicate[0])
             ));
         }
 
-        return builder.and(predicates.toArray(new Predicate[]{}));
+        return cb.and(predicates.toArray(new Predicate[]{}));
     }
 }

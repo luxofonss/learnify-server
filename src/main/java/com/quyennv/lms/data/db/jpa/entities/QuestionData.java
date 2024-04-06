@@ -16,7 +16,7 @@ import java.util.UUID;
 @Entity(name="questions")
 @Getter
 @Setter
-@ToString(exclude = {"creator", "assignment", "subject", "quetions", "choices", "textAnswers", "questions"})
+@ToString(exclude = {"creator", "assignment", "subject", "choices", "textAnswers", "question", "subQuestions"})
 @Table(name="questions")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -53,7 +53,7 @@ public class QuestionData extends BaseEntity{
     private QuestionData question;
 
     @OneToMany(mappedBy="question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<QuestionData> questions;
+    private List<QuestionData> subQuestions;
 
     public static QuestionData withId(UUID id) {
         QuestionData q = QuestionData.builder().build();
@@ -108,15 +108,15 @@ public class QuestionData extends BaseEntity{
             result.setTextAnswers(textAnswers);
         }
 
-        if (Objects.nonNull(q.getQuestions())) {
-            List<QuestionData> questions = q.getQuestions().stream().map(
+        if (Objects.nonNull(q.getSubQuestions())) {
+            List<QuestionData> questions = q.getSubQuestions().stream().map(
                     qu -> {
                         QuestionData question = QuestionData.from(qu);
                         question.setQuestion(result);
                         return question;
                     }
             ).toList();
-            result.setQuestions(questions);
+            result.setSubQuestions(questions);
         }
 
         if (Objects.nonNull(q.getQuestion())) {
@@ -155,8 +155,8 @@ public class QuestionData extends BaseEntity{
             result.setTextAnswers(this.textAnswers.stream().map(QuestionTextAnswerData::fromThis).toList());
         }
 
-        if (Objects.nonNull(this.questions)) {
-            result.setQuestions(this.questions.stream().map(QuestionData::fromThis).toList());
+        if (Objects.nonNull(this.subQuestions)) {
+            result.setSubQuestions(this.subQuestions.stream().map(QuestionData::fromThis).toList());
         }
 
         return result;

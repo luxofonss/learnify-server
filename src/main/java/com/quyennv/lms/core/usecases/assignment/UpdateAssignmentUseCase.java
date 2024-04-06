@@ -10,7 +10,6 @@ import lombok.Value;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class UpdateAssignmentUseCase extends UseCase<
         UpdateAssignmentUseCase.InputValues, UpdateAssignmentUseCase.OutputValues>{
@@ -22,7 +21,7 @@ public abstract class UpdateAssignmentUseCase extends UseCase<
 
     @Override
     public OutputValues execute(InputValues input) {
-        Assignment assignment = assignmentRepository.findById(input.getId())
+        Assignment assignment = assignmentRepository.findById(input.getAssignmentId())
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
 
         if (checkPermission(input, assignment).equals(Boolean.FALSE)) {
@@ -35,8 +34,8 @@ public abstract class UpdateAssignmentUseCase extends UseCase<
 
     public abstract Assignment update(InputValues input, Assignment assignment);
 
-    public List<Question> mapQuestions(InputValues input) {
-        return input.getQuestions().stream().map(
+    public List<Question> mapQuestions(List<UpdateAssignmentUseCase.QuestionInput> questions, InputValues input) {
+        return questions.stream().map(
                 q -> {
                     Question question = Question
                             .builder()
@@ -74,6 +73,11 @@ public abstract class UpdateAssignmentUseCase extends UseCase<
                                         .build()
                         ).toList());
                     }
+
+                    if(Objects.nonNull(q.getSubQuestions())) {
+                        question.setSubQuestions(mapQuestions(q.getSubQuestions(), input));
+                    }
+
                     return question;
                 }
         ).toList();
@@ -86,7 +90,7 @@ public abstract class UpdateAssignmentUseCase extends UseCase<
     @Value
     @Builder
     public static class InputValues implements UseCase.InputValues {
-        Identity id;
+        Identity assignmentId;
         String title;
         String description;
         Identity teacherId;
@@ -113,6 +117,7 @@ public abstract class UpdateAssignmentUseCase extends UseCase<
         String answerExplanation;
         List<UpdateAssignmentUseCase.QuestionChoiceInput> choices;
         List<UpdateAssignmentUseCase.QuestionTextAnswerInput> textAnswers;
+        List<UpdateAssignmentUseCase.QuestionInput> subQuestions;
     }
 
     @Value

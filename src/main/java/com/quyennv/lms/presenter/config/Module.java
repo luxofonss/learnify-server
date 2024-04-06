@@ -1,10 +1,8 @@
 package com.quyennv.lms.presenter.config;
 
-import com.quyennv.lms.core.domain.entities.Course;
-import com.quyennv.lms.core.usecases.assignment.AssignmentRepository;
-import com.quyennv.lms.core.usecases.assignment.CreateAssignmentUseCase;
-import com.quyennv.lms.core.usecases.assignment.UpdateAssignmentDetailUseCase;
+import com.quyennv.lms.core.usecases.assignment.*;
 import com.quyennv.lms.core.usecases.course.*;
+import com.quyennv.lms.core.usecases.question.QuestionRepository;
 import com.quyennv.lms.core.usecases.user.CreateUserUseCase;
 import com.quyennv.lms.core.usecases.user.GetAuthProfileUseCase;
 import com.quyennv.lms.core.usecases.user.UserRepository;
@@ -126,5 +124,16 @@ public class Module {
     @Bean
     UpdateAssignmentDetailUseCase updateAssignmentDetailUseCase(AssignmentRepository assignmentRepository) {
         return new UpdateAssignmentDetailUseCase(assignmentRepository);
+    }
+
+    @Bean
+    AddQuestionsToAssignmentUseCase addQuestionsToAssignmentUseCase(AssignmentRepository assignmentRepository,
+                                                                    QuestionRepository questionRepository) {
+        return new AddQuestionsToAssignmentUseCase(assignmentRepository, questionRepository);
+    }
+
+    @Bean
+    GetOneAssignmentUseCase getOneAssignmentUseCase(AssignmentRepository assignmentRepository) {
+        return new GetOneAssignmentUseCase(assignmentRepository);
     }
 }

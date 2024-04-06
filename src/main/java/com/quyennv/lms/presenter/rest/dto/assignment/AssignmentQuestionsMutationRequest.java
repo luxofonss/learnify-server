@@ -11,7 +11,6 @@ import java.util.List;
 @Value
 public class AssignmentQuestionsMutationRequest {
     String id;
-    @NotBlank
     String title;
     String description;
     String image;
@@ -24,4 +23,5 @@ public class AssignmentQuestionsMutationRequest {
     String answerExplanation;
     List<QuestionsInputChoicesRequest> choices;
     List<QuestionsInputTextAnswersRequest> textAnswers;
+    List<AssignmentQuestionsMutationRequest> subQuestions;
 }

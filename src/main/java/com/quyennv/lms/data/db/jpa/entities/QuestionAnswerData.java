@@ -20,7 +20,7 @@ public class QuestionAnswerData extends BaseEntity{
     private String textAnswer;
     private Integer score;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="question_id")
     private QuestionData question;
     @ManyToOne

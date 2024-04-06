@@ -8,7 +8,6 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,7 +46,7 @@ public class CreateAssignmentUseCase extends UseCase<
                 .totalMark(mark.get())
                 .build();
 
-        List<Question> questions = mapQuestions(input);
+        List<Question> questions = mapQuestions(input.getQuestions(), input);
         assignment.setQuestions(questions);
 
         if(Objects.nonNull(input.getPlacement())) {
@@ -72,8 +71,8 @@ public class CreateAssignmentUseCase extends UseCase<
         );
     }
 
-    private List<Question> mapQuestions(InputValues input) {
-        return input.getQuestions().stream().map(
+    private List<Question> mapQuestions(List<QuestionInput> questions, InputValues input) {
+        return questions.stream().map(
                 q -> {
                     Question question = Question
                             .builder()
@@ -108,6 +107,11 @@ public class CreateAssignmentUseCase extends UseCase<
                                         .build()
                         ).toList());
                     }
+
+                    if (Objects.nonNull(q.getSubQuestions())) {
+                        question.setSubQuestions(mapQuestions(q.getSubQuestions(), input));
+                    }
+
                     return question;
                 }
         ).toList();
@@ -142,6 +146,7 @@ public class CreateAssignmentUseCase extends UseCase<
         String answerExplanation;
         List<QuestionChoiceInput> choices;
         List<QuestionTextAnswerInput> textAnswers;
+        List<QuestionInput> subQuestions;
     }
 
     @Value

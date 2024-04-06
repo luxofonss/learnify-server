@@ -12,7 +12,6 @@ import java.util.List;
 public class UpdateAssignmentRequest {
     @NotBlank
     String id;
-    @NotBlank 
     String title;
     String description;
     Identity subjectId;

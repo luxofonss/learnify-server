@@ -3,12 +3,10 @@ package com.quyennv.lms.presenter.rest.mapper.assignment;
 import com.quyennv.lms.core.domain.entities.Identity;
 import com.quyennv.lms.core.domain.enums.QuestionLevel;
 import com.quyennv.lms.core.domain.enums.QuestionType;
-import com.quyennv.lms.core.usecases.assignment.CreateAssignmentUseCase;
 import com.quyennv.lms.core.usecases.assignment.UpdateAssignmentUseCase;
 import com.quyennv.lms.presenter.rest.dto.assignment.AssignmentQuestionsMutationRequest;
 import com.quyennv.lms.presenter.rest.dto.assignment.QuestionsInputChoicesRequest;
 import com.quyennv.lms.presenter.rest.dto.assignment.QuestionsInputTextAnswersRequest;
-import com.quyennv.lms.presenter.rest.dto.assignment.UpdateAssignmentRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +21,13 @@ public abstract class UpdateAssignmentUseCaseRequestMapper {
                 q -> {
                     UpdateAssignmentUseCase.QuestionInput input = UpdateAssignmentUseCase.QuestionInput
                             .builder()
-                            .id(Identity.fromString(q.getId()))
-                            .level(QuestionLevel.valueOf(q.getLevel()))
+                            .id(Objects.nonNull(q.getId()) ? Identity.fromString(q.getId()) : null)
+                            .level(Objects.nonNull(q.getLevel()) ? QuestionLevel.valueOf(q.getLevel()) : null)
                             .title(q.getTitle())
                             .image(q.getImage())
                             .audio(q.getAudio())
                             .mark(q.getMark())
-                            .type(QuestionType.valueOf(q.getType()))
+                            .type(Objects.nonNull(q.getType()) ?QuestionType.valueOf(q.getType()) : null)
                             .answerExplanation(q.getAnswerExplanation())
                             .build();
 
@@ -43,6 +41,11 @@ public abstract class UpdateAssignmentUseCaseRequestMapper {
                         input.setTextAnswers(textAnswers);
                     }
 
+                    if (Objects.nonNull(q.getSubQuestions())) {
+                        List<UpdateAssignmentUseCase.QuestionInput> subQuestions = mapQuestions(q.getSubQuestions());
+                        input.setSubQuestions(subQuestions);
+                    }
+
                     return input;
                 }
         ).toList();
@@ -52,7 +55,7 @@ public abstract class UpdateAssignmentUseCaseRequestMapper {
         return choices.stream().map(
                 q -> UpdateAssignmentUseCase.QuestionChoiceInput
                         .builder()
-                        .id(Identity.fromString(q.getId()))
+                        .id(Objects.nonNull(q.getId()) ? Identity.fromString(q.getId()) : null)
                         .content(q.getContent())
                         .order(q.getOrder())
                         .isCorrect(q.getIsCorrect())
@@ -66,7 +69,7 @@ public abstract class UpdateAssignmentUseCaseRequestMapper {
         return textAnswers.stream().map(
                 ta -> UpdateAssignmentUseCase.QuestionTextAnswerInput
                         .builder()
-                        .id(Identity.fromString(ta.getId()))
+                        .id(Objects.nonNull(ta.getId()) ? Identity.fromString(ta.getId()) : null)
                         .answer(ta.getAnswer())
                         .explanation(ta.getExplanation())
                         .build()

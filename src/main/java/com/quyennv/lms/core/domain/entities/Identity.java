@@ -1,10 +1,12 @@
 package com.quyennv.lms.core.domain.entities;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.UUID;
 
 @Value
+@EqualsAndHashCode(of={"id"})
 public class Identity {
     UUID id;
     public static Identity newIdentity() {

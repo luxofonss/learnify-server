@@ -34,6 +34,7 @@ public class CreateAssignmentUseCaseInputMapper {
         if (Objects.isNull(questions)) {
             return new ArrayList<>();
         }
+        log.info("questions: {}", questions.get(0).getSubQuestions());
         return questions.stream().map(
                 q -> CreateAssignmentUseCase.QuestionInput
                         .builder()
@@ -60,6 +61,7 @@ public class CreateAssignmentUseCaseInputMapper {
                                         .explanation(ta.getExplanation())
                                         .build()
                         ).toList())
+                        .subQuestions(Objects.nonNull(q.getSubQuestions()) ? mapQuestions(q.getSubQuestions()) : null)
                         .build()
         ).toList();
     }

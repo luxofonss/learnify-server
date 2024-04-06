@@ -8,6 +8,7 @@ import com.quyennv.lms.presenter.usecases.security.CurrentUser;
 import com.quyennv.lms.presenter.usecases.security.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,9 +22,24 @@ public interface AssignmentResource {
             @CurrentUser UserPrincipal requester,
             HttpServletRequest httpServletRequest
     );
+    @GetMapping("/{id}")
+    CompletableFuture<ApiResponse> getOne(
+            @PathVariable @NotNull String id,
+            @CurrentUser UserPrincipal requester,
+            HttpServletRequest httpServletRequest
+    );
+
 
     @PutMapping("/{id}")
     CompletableFuture<ApiResponse> update(
+            @Valid @RequestBody UpdateAssignmentRequest req,
+            @PathVariable String id,
+            @CurrentUser UserPrincipal requester,
+            HttpServletRequest httpServletRequest
+    );
+
+    @PostMapping("/{id}/questions")
+    CompletableFuture<ApiResponse> addQuestions(
             @Valid @RequestBody UpdateAssignmentRequest req,
             @PathVariable String id,
             @CurrentUser UserPrincipal requester,

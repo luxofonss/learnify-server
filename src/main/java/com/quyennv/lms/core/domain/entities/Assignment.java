@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,6 +46,30 @@ public class Assignment {
             this.setQuestions(updateAssignment.getQuestions());
         }
 
+        AtomicReference<Integer> newTotalMark = new AtomicReference<>(0);
+
+        this.getQuestions().forEach(
+                q -> newTotalMark.updateAndGet(v -> v + updateAssignment.getTotalMark())
+        );
+        this.setTotalMark(newTotalMark.get());
+
+        return this;
+    }
+
+    public Assignment addQuestions(List<Question> questions) {
+        if (Objects.isNull(questions) || questions.isEmpty()) {
+            throw new RuntimeException("Questions are required");
+        }
+        List<Question> newQuestions = new ArrayList<>(this.getQuestions());
+        newQuestions.addAll(questions);
+
+        this.setQuestions(newQuestions);
+
+        AtomicReference<Integer> newTotalMark = new AtomicReference<>(0);
+        this.getQuestions().forEach(
+                q -> newTotalMark.updateAndGet(v -> v + q.getMark())
+        );
+        this.setTotalMark(newTotalMark.get());
         return this;
     }
 }
